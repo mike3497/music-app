@@ -9,3 +9,13 @@ export interface AlbumDTO {
   songs: SongDTO[];
   title: string;
 }
+
+export const defaultAlbumDTO: AlbumDTO = {
+  artist: '',
+  artwork_url: '',
+  created_at: '',
+  id: '',
+  release_date: '',
+  songs: [],
+  title: '',
+};

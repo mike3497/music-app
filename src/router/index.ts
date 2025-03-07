@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '@/views/HomeView.vue';
 import { supabase } from '@/lib/supabaseClient';
+import { useUserStore } from '@/stores/userStore';
+import { Role } from '@/types/role';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +30,12 @@ const router = createRouter({
       meta: { isAuthRequired: true },
     },
     {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('@/views/admin/AdminView.vue'),
+      meta: { isAuthRequired: true, requiredRole: Role.ADMIN },
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('@/views/NotFoundView.vue'),
@@ -36,16 +44,15 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const userStore = useUserStore();
+  await userStore.fetchSession();
 
-  if (to.meta.isAuthRequired && !session) {
-    return { name: 'sign-in' };
+  if (to.meta.isAuthRequired && !userStore.isLoggedIn) {
+    return '/sign-in';
   }
 
-  if (session && to.name === 'sign-in') {
-    return { name: 'home' };
+  if (to.meta.requiredRole && userStore.profile?.role !== to.meta.requiredRole) {
+    return '/';
   }
 });
 

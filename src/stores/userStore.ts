@@ -5,12 +5,17 @@ import { supabase } from '@/lib/supabaseClient';
 import type { Session } from '@supabase/supabase-js';
 import type { UserProfileDTO } from '@/models/userProfileDTO';
 import { useRouter } from 'vue-router';
+import { Role } from '@/types/role';
 
 export const useUserStore = defineStore('user', () => {
   const router = useRouter();
 
   const session = ref<Session | null>(null);
   const profile = ref<UserProfileDTO | null>(null);
+
+  const isAdmin = computed<boolean>(() => {
+    return profile.value?.role === Role.ADMIN || false;
+  });
 
   const fetchSession = async () => {
     const {
@@ -22,7 +27,7 @@ export const useUserStore = defineStore('user', () => {
       return;
     }
     session.value = sessionData;
-    if (sessionData) {
+    if (sessionData && !profile.value) {
       await fetchProfile();
     }
   };
@@ -31,7 +36,7 @@ export const useUserStore = defineStore('user', () => {
     if (session.value && session.value.user) {
       const { data: profileData, error } = await supabase
         .from('users')
-        .select('avatar_url, first_name, last_name')
+        .select('avatar_url, first_name, last_name, role')
         .eq('auth_id', session.value.user.id)
         .single();
 
@@ -43,19 +48,19 @@ export const useUserStore = defineStore('user', () => {
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<string | null> => {
     const { error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     });
 
     if (error) {
-      console.error('Error signing in:', error);
-      return false;
+      return error.message;
     }
 
     await fetchSession();
     router.push({ name: 'home' });
+    return null;
   };
 
   const signOut = async () => {
@@ -84,10 +89,11 @@ export const useUserStore = defineStore('user', () => {
     fetchProfile,
     fetchSession,
     fullName,
+    isAdmin,
     isLoggedIn,
     profile,
-    signIn,
     session,
+    signIn,
     signOut,
   };
 });

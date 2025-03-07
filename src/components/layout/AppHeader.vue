@@ -16,6 +16,9 @@
             class="menu dropdown-content bg-base-100 rounded-box z-1 mt-4 w-32 p-2 shadow-sm"
           >
             <li><RouterLink :to="{ name: 'profile' }">Profile</RouterLink></li>
+            <li v-if="userStore.isAdmin">
+              <RouterLink :to="{ name: 'admin' }">Admin</RouterLink>
+            </li>
             <li><button @click="onSignOutClick">Sign Out</button></li>
           </ul>
         </div>
