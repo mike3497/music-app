@@ -1,4 +1,4 @@
-// stores/user.js
+import { type SignUpForm } from '@/models/signUpForm';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import { supabase } from '@/lib/supabaseClient';
@@ -18,16 +18,15 @@ export const useUserStore = defineStore('user', () => {
   });
 
   const fetchSession = async () => {
-    const {
-      data: { session: sessionData },
-      error,
-    } = await supabase.auth.getSession();
+    const { data, error } = await supabase.auth.getSession();
+
     if (error) {
       console.error('Error fetching session:', error);
       return;
     }
-    session.value = sessionData;
-    if (sessionData && !profile.value) {
+
+    session.value = data.session;
+    if (session.value && !profile.value) {
       await fetchProfile();
     }
   };
@@ -44,8 +43,34 @@ export const useUserStore = defineStore('user', () => {
         console.error('Error fetching user profile:', error);
         return;
       }
+
       profile.value = profileData;
     }
+  };
+
+  const signUp = async (signUpForm: SignUpForm): Promise<string | null> => {
+    const { data, error } = await supabase.auth.signUp({
+      email: signUpForm.email,
+      password: signUpForm.password,
+      options: {
+        data: {
+          first_name: signUpForm.firstName,
+          last_name: signUpForm.lastName,
+        },
+      },
+    });
+
+    if (error) {
+      return error.message;
+    }
+
+    session.value = data.session;
+    if (session.value && !profile.value) {
+      await fetchProfile();
+    }
+
+    router.push({ name: 'home' });
+    return null;
   };
 
   const signIn = async (email: string, password: string): Promise<string | null> => {
@@ -95,5 +120,6 @@ export const useUserStore = defineStore('user', () => {
     session,
     signIn,
     signOut,
+    signUp,
   };
 });

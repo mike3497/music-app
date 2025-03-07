@@ -1,6 +1,7 @@
 <template>
   <div class="container mx-auto p-4 h-svh">
     <BaseCard title="Sign Up">
+      <BaseAlert v-if="errorMessage" :alertColor="AlertColor.ERROR" :message="errorMessage" />
       <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
         <div class="flex flex-col gap-2">
           <label for="email">Email</label>
@@ -38,35 +39,21 @@
 </template>
 
 <script setup lang="ts">
+import BaseAlert from '@/components/shared/BaseAlert.vue';
 import BaseButton from '@/components/shared/BaseButton.vue';
 import BaseCard from '@/components/shared/BaseCard.vue';
 import BaseInput from '@/components/shared/BaseInput.vue';
-import { supabase } from '@/lib/supabaseClient';
 import { defaultSignUpForm, type SignUpForm } from '@/models/signUpForm';
+import { useUserStore } from '@/stores/userStore';
+import { AlertColor } from '@/types/alertColor';
 import { ref } from 'vue';
 
+const userStore = useUserStore();
+
+const errorMessage = ref<string | null>(null);
 const signUpFormModel = ref<SignUpForm>(defaultSignUpForm);
 
 const onSubmit = async () => {
-  try {
-    const { data, error } = await supabase.auth.signUp({
-      email: signUpFormModel.value.email,
-      password: signUpFormModel.value.password,
-      options: {
-        data: {
-          first_name: signUpFormModel.value.firstName,
-          last_name: signUpFormModel.value.lastName,
-        },
-      },
-    });
-
-    if (error) {
-      console.error('Error signing up:', error);
-    }
-
-    console.log('data', data);
-  } catch (error: unknown) {
-    console.error('Error signing up:', error);
-  }
+  errorMessage.value = await userStore.signUp(signUpFormModel.value);
 };
 </script>
