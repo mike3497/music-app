@@ -19,9 +19,9 @@
                 <BaseButton @click="onRateSong(song.id)" class="">
                   <Star />
                 </BaseButton>
-                <BaseButton @click="onCommentSong(song.id)" class="">
+                <!-- <BaseButton @click="onCommentSong(song.id)" class="">
                   <MessageCircle />
-                </BaseButton>
+                </BaseButton> -->
               </div>
             </li>
           </ul>
@@ -29,18 +29,28 @@
       </div>
     </BaseCard>
   </div>
+  <RatingModal
+    :isOpen="isRatingModalOpen"
+    :songId="ratingModalSongId"
+    :songTitle="ratingModalSongTitle"
+    @close="onRatingModalClose"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { supabase } from '@/lib/supabaseClient';
-import BaseCard from '@/components/shared/BaseCard.vue';
-import { defaultAlbumDTO, type AlbumDTO } from '@/models/albumDTO';
-import { Star, MessageCircle } from 'lucide-vue-next';
+import RatingModal from '@/components/RatingModal.vue';
 import BaseButton from '@/components/shared/BaseButton.vue';
+import BaseCard from '@/components/shared/BaseCard.vue';
+import { supabase } from '@/lib/supabaseClient';
+import { defaultAlbumDTO, type AlbumDTO } from '@/models/albumDTO';
+import { Star } from 'lucide-vue-next';
+import { onMounted, ref } from 'vue';
 
 const currentAlbum = ref<AlbumDTO>(defaultAlbumDTO);
 const isLoading = ref<boolean>(false);
+const isRatingModalOpen = ref<boolean>(false);
+const ratingModalSongId = ref<string>('');
+const ratingModalSongTitle = ref<string>('');
 
 const fetchAlbum = async () => {
   try {
@@ -53,7 +63,6 @@ const fetchAlbum = async () => {
     }
 
     if (data) {
-      console.log('wow');
       currentAlbum.value = {
         artist: data.artist,
         artwork_url: data.artwork_url,
@@ -64,22 +73,31 @@ const fetchAlbum = async () => {
         title: data.title,
       };
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Network error:', error);
   } finally {
     isLoading.value = false;
   }
 };
 
+const onRatingModalClose = () => {
+  isRatingModalOpen.value = false;
+};
+
+const onRateSong = async (songId: string) => {
+  const songTtile = currentAlbum.value.songs.find((song) => song.id === songId)?.title;
+  if (songTtile) {
+    ratingModalSongId.value = songId;
+    ratingModalSongTitle.value = songTtile;
+    isRatingModalOpen.value = true;
+  }
+};
+
+// const onCommentSong = async (songId: string) => {
+//   console.log('Comment song:', songId);
+// };
+
 onMounted(async () => {
   await fetchAlbum();
 });
-
-const onRateSong = async (songId: string) => {
-  console.log('Rate song:', songId);
-};
-
-const onCommentSong = async (songId: string) => {
-  console.log('Comment song:', songId);
-};
 </script>
