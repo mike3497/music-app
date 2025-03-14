@@ -55,7 +55,7 @@ const ratingModalSongTitle = ref<string>('');
 const fetchAlbum = async () => {
   try {
     isLoading.value = true;
-    const { data, error } = await supabase.from('albums').select('*, songs(*)').single();
+    const { data, error } = await supabase.from('albums').select('*, songs(*)');
 
     if (error) {
       console.error('Error fetching weekly album:', error);
@@ -64,13 +64,13 @@ const fetchAlbum = async () => {
 
     if (data) {
       currentAlbum.value = {
-        artist: data.artist,
-        artwork_url: data.artwork_url,
-        created_at: data.created_at,
-        id: data.id,
-        release_date: data.release_date,
-        songs: data.songs,
-        title: data.title,
+        artist: data[0].artist,
+        artwork_url: data[0].artwork_url,
+        created_at: data[0].created_at,
+        id: data[0].id,
+        release_date: data[0].release_date,
+        songs: data[0].songs,
+        title: data[0].title,
       };
     }
   } catch (error: unknown) {

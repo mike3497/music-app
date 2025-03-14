@@ -1,10 +1,10 @@
 <template>
-  <div :class="{ 'modal modal-open': isOpen }" class="modal">
-    <div ref="target" class="modal-box">
+  <div class="modal" :class="{ 'modal-open': isOpen }" aria-modal="true" role="dialog">
+    <div ref="target" class="modal-box" aria-labelledby="modal-title">
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="close">
         <X />
       </button>
-      <h3 class="font-bold text-lg">{{ title }}</h3>
+      <h3 id="modal-title" class="font-bold text-lg">{{ title }}</h3>
       <slot></slot>
       <div class="modal-action">
         <BaseButton @click="close">Close</BaseButton>
