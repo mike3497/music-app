@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-2" :class="{ 'has-error': !!errorMessage }">
-    <label class="font-bold" :for="name">
+    <label :for="name">
       {{ label }}
       <span v-if="isRequired" class="text-red-600">*</span>
     </label>
