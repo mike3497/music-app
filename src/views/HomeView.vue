@@ -26,49 +26,29 @@
           <div>
             <h3 class="text-xl font-semibold">{{ selectedAlbum.title }}</h3>
             <p>{{ selectedAlbum.artist }}</p>
-            <ul class="list">
-              <li v-for="song in selectedAlbum.songs" :key="song.id" class="list-row items-center">
-                <span>#{{ song.track_number }}</span>
-                <span>{{ song.title }}</span>
-                <div class="flex gap-2">
-                  <BaseButton @click="onRateSong(song.id)" class="">
-                    <Star />
-                  </BaseButton>
-                  <!-- <BaseButton @click="onCommentSong(song.id)" class="">
-                  <MessageCircle />
-                </BaseButton> -->
-                </div>
-              </li>
-            </ul>
+            <SongList :songs="selectedAlbum.songs" />
           </div>
         </template>
       </div>
     </BaseCard>
   </div>
-  <RatingModal
-    :isOpen="isRatingModalOpen"
-    :songId="ratingModalSongId"
-    :songTitle="ratingModalSongTitle"
-    @close="onRatingModalClose"
-  />
 </template>
 
 <script setup lang="ts">
-import RatingModal from '@/components/RatingModal.vue';
-import BaseButton from '@/components/shared/BaseButton.vue';
 import BaseCard from '@/components/shared/BaseCard.vue';
+import SongList from '@/components/SongList.vue';
 import { supabase } from '@/lib/supabaseClient';
 import { type AlbumDTO } from '@/models/albumDTO';
-import { Star } from 'lucide-vue-next';
+import type { AlbumWithUserRatingsDTO } from '@/models/albumWithUserRatingsDTO';
+import { useUserStore } from '@/stores/userStore';
 import { onMounted, ref } from 'vue';
+
+const userStore = useUserStore();
 
 const albums = ref<AlbumDTO[]>([]);
 const isLoading = ref<boolean>(false);
-const isRatingModalOpen = ref<boolean>(false);
-const ratingModalSongId = ref<string>('');
-const ratingModalSongTitle = ref<string>('');
 const selectedAlbumId = ref<string | null>(null);
-const selectedAlbum = ref<AlbumDTO | null>(null);
+const selectedAlbum = ref<AlbumWithUserRatingsDTO | null>(null);
 
 const fetchAlbums = async () => {
   try {
@@ -93,12 +73,10 @@ const fetchAlbums = async () => {
 const fetchAlbum = async () => {
   try {
     isLoading.value = true;
-    const { data, error } = await supabase
-      .from('albums')
-      .select('*, songs(*)')
-      .eq('id', selectedAlbumId.value)
-      .order('track_number', { referencedTable: 'songs' })
-      .maybeSingle();
+    const { data, error } = await supabase.rpc('get_album_with_songs_and_user_ratings', {
+      p_album_id: selectedAlbumId.value,
+      p_user_id: userStore.session?.user.id,
+    });
 
     if (error) {
       console.error('Error fetching album:', error);
@@ -106,15 +84,7 @@ const fetchAlbum = async () => {
     }
 
     if (data) {
-      selectedAlbum.value = {
-        artist: data.artist,
-        artwork_url: data.artwork_url,
-        created_at: data.created_at,
-        id: data.id,
-        release_date: data.release_date,
-        songs: data.songs,
-        title: data.title,
-      };
+      selectedAlbum.value = data;
     }
   } catch (error: unknown) {
     console.error('Network error:', error);
@@ -122,23 +92,6 @@ const fetchAlbum = async () => {
     isLoading.value = false;
   }
 };
-
-const onRatingModalClose = () => {
-  isRatingModalOpen.value = false;
-};
-
-const onRateSong = async (songId: string) => {
-  const songTtile = selectedAlbum.value?.songs.find((song) => song.id === songId)?.title;
-  if (songTtile) {
-    ratingModalSongId.value = songId;
-    ratingModalSongTitle.value = songTtile;
-    isRatingModalOpen.value = true;
-  }
-};
-
-// const onCommentSong = async (songId: string) => {
-//   console.log('Comment song:', songId);
-// };
 
 const onSelectedAlbumChanged = (event: Event) => {
   const target = event.target as HTMLSelectElement;
@@ -152,6 +105,5 @@ const getFormattedAlbum = (album: AlbumDTO) => {
 
 onMounted(async () => {
   await fetchAlbums();
-  // await fetchAlbum();
 });
 </script>
