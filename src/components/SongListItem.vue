@@ -21,12 +21,16 @@
 </template>
 
 <script setup lang="ts">
+import { useToast } from '@/composables/useToast';
 import { supabase } from '@/lib/supabaseClient';
 import type { SongWithUserRatingDTO } from '@/models/songWithUserRatingDTO';
+import { ToastVariant } from '@/models/toast';
 import { useUserStore } from '@/stores/userStore';
 import { computed, ref } from 'vue';
 
 const userStore = useUserStore();
+
+const toast = useToast();
 
 const props = defineProps<{
   song: SongWithUserRatingDTO;
@@ -50,16 +54,18 @@ const onRateSong = async (rating: number) => {
 
     if (error) {
       console.error('error upserting rating', error);
+      toast.open('Failed to save rating. Please try again.', ToastVariant.ERROR);
       return;
     }
 
     if (data) {
-      close();
+      toast.open(`Your rating for '${props.song.title}' has been saved.`, ToastVariant.SUCCESS);
     }
   } catch (error: unknown) {
     console.error('Error rating song:', error);
+    toast.open('An unexpected error occurred.', ToastVariant.ERROR);
   } finally {
-    isProcessing.value = true;
+    isProcessing.value = false;
   }
 };
 </script>
