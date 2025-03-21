@@ -1,20 +1,24 @@
 <template>
-  <li class="list-row items-center">
-    <span>#{{ song.track_number }}</span>
-    <span>{{ song.title }}</span>
-    <div class="flex gap-2">
-      <div class="rating">
-        <input
-          v-for="n in 5"
-          v-model="ratingModel"
-          class="mask mask-star"
-          type="radio"
-          :name="name"
-          :ariaLabel="`${n} star`"
-          :key="n"
-          :value="n"
-          @change="onRateSong(n)"
-        />
+  <li class="list-row">
+    <div class="text-4xl font-thin opacity-30 tabular-nums">
+      {{ padNumber(song.track_number, 2) }}
+    </div>
+    <div class="list-col-grow">
+      <div class="text-xs uppercase font-semibold opacity-60">{{ song.title }}</div>
+      <div class="flex gap-2">
+        <div class="rating">
+          <input
+            v-for="n in 5"
+            v-model="ratingModel"
+            class="mask mask-star"
+            type="radio"
+            :name="name"
+            :ariaLabel="`${n} star`"
+            :key="n"
+            :value="n"
+            @change="onRateSong(n)"
+          />
+        </div>
       </div>
     </div>
   </li>
@@ -22,6 +26,7 @@
 
 <script setup lang="ts">
 import { useToast } from '@/composables/useToast';
+import { padNumber } from '@/helpers/stringHelper';
 import { supabase } from '@/lib/supabaseClient';
 import type { SongWithUserRatingDTO } from '@/models/songWithUserRatingDTO';
 import { ToastVariant } from '@/models/toast';
@@ -37,7 +42,7 @@ const props = defineProps<{
 }>();
 
 const isProcessing = ref<boolean>(false);
-const ratingModel = ref<number>(props.song.user_rating);
+const ratingModel = ref<number>(props.song.signed_in_user_rating);
 
 const name = computed(() => {
   return props.song.title;

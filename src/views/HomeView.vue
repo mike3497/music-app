@@ -42,7 +42,7 @@ const selectedAlbum = ref<AlbumWithUserRatingsDTO | null>(null);
 const fetchAlbum = async () => {
   try {
     isLoading.value = true;
-    const { data, error } = await supabase.rpc('get_album_with_songs_and_user_ratings', {
+    const { data, error } = await supabase.rpc('get_album_with_user_ratings', {
       p_album_id: selectedAlbumId.value,
       p_user_id: userStore.session?.user.id,
     });
