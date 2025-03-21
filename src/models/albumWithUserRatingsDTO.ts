@@ -1,4 +1,4 @@
-import type { SongWithUserRatingDTO } from './songWithUserRatingDTO';
+import type { SongWithUserRatingDTO } from '@/models/songWithUserRatingDTO';
 
 export interface AlbumWithUserRatingsDTO {
   artist: string;
