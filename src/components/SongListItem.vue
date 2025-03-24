@@ -64,7 +64,7 @@ const onRateSong = async (rating: number) => {
     }
 
     if (data) {
-      toast.open(`Your rating for '${props.song.title}' has been saved.`, ToastVariant.SUCCESS);
+      toast.open(`Rating was saved sucessfully!`, ToastVariant.SUCCESS);
     }
   } catch (error: unknown) {
     console.error('Error rating song:', error);
