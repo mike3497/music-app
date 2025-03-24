@@ -6,9 +6,9 @@
 
 <script setup lang="ts">
 import SongListItem from '@/components/SongListItem.vue';
-import type { SongDTO } from '@/models/songDTO';
+import type { SongWithUserRatingDTO } from '@/models/songWithUserRatingDTO';
 
 defineProps<{
-  songs: Array<SongDTO>;
+  songs: Array<SongWithUserRatingDTO>;
 }>();
 </script>
