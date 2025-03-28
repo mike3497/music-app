@@ -5,14 +5,13 @@ export interface SongWithUserRatingDTO {
   title: string;
   track_number: number;
   signed_in_user_rating: number;
-  user_ratings: [
-    {
-      rating: number;
-      user_id: string;
-      user: {
-        first_name: string;
-        last_name: string;
-      };
-    },
-  ];
+  user_ratings: {
+    rating: number;
+    user_id: string;
+    user: {
+      avatar_url: string;
+      first_name: string;
+      last_name: string;
+    };
+  }[];
 }
