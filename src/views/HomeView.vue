@@ -14,8 +14,8 @@
             class="w-full object-cover rounded-lg mb-4"
           />
           <div>
-            <h3 class="text-xl font-semibold">{{ selectedAlbum.title }}</h3>
-            <p>{{ selectedAlbum.artist }}</p>
+            <h1 class="text-xl font-bold">{{ selectedAlbum.title }}</h1>
+            <p class="mb-2">{{ selectedAlbum.artist }}</p>
             <SongList :songs="selectedAlbum.songs" />
           </div>
         </template>
