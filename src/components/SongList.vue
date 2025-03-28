@@ -1,5 +1,5 @@
 <template>
-  <ul class="list">
+  <ul class="flex flex-col">
     <SongListItem v-for="song in songs" :key="song.id" :song="song" />
   </ul>
 </template>
