@@ -6,6 +6,7 @@ export interface AlbumWithUserRatingsDTO {
   created_at: string;
   id: string;
   release_date: string;
+  signed_in_user_overall_rating: number | null;
   songs: SongWithUserRatingDTO[];
   title: string;
 }

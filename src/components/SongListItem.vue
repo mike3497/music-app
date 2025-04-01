@@ -54,7 +54,7 @@
             </div>
             <h1 class="">{{ user_rating.user.first_name }} {{ user_rating.user.last_name }}</h1>
           </div>
-          <StarRating :maxRating="5" :rating="user_rating.rating" />
+          <StarRating color="secondary" :maxRating="5" :rating="user_rating.rating" />
         </div>
       </div>
     </div>
