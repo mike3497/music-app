@@ -11,7 +11,7 @@
 import { computed, defineProps } from 'vue';
 
 const props = defineProps<{
-  color: string;
+  color?: string;
   rating: number;
   maxRating: number;
 }>();
@@ -23,7 +23,7 @@ const color = computed<string>(() => {
     case 'secondary':
       return 'bg-secondary';
     default:
-      return 'bg-primary';
+      return 'bg-black';
   }
 });
 </script>

@@ -1,27 +1,25 @@
 <template>
   <div class="container mx-auto p-4 h-svh">
-    <BaseCard>
-      <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4">
+      <BaseCard title="Album Selector">
         <AlbumSelector :value="selectedAlbumId" @change="onAlbumSelectorChange" />
-        <div v-if="isLoading" class="flex items-center gap-2">
-          <span class="loading loading-spinner loading-sm"></span>
-          <span>Loading album...</span>
+      </BaseCard>
+      <BaseCard v-if="selectedAlbum" title="Album">
+        <img
+          :src="selectedAlbum.artwork_url"
+          alt="Album Artwork"
+          class="w-full object-cover rounded-lg mb-4"
+        />
+        <div class="flex flex-col gap-1">
+          <h1 class="text-xl font-bold">{{ selectedAlbum.title }}</h1>
+          <p>{{ selectedAlbum.artist }}</p>
+          <StarRating :rating="overallRating" :maxRating="5" />
         </div>
-        <template v-else-if="selectedAlbum">
-          <img
-            :src="selectedAlbum.artwork_url"
-            alt="Album Artwork"
-            class="w-full object-cover rounded-lg mb-4"
-          />
-          <div class="flex flex-col gap-1">
-            <h1 class="text-xl font-bold">{{ selectedAlbum.title }}</h1>
-            <p>{{ selectedAlbum.artist }}</p>
-            <StarRating color="primary" :rating="overallRating" :maxRating="5" />
-            <SongList :songs="selectedAlbum.songs" />
-          </div>
-        </template>
-      </div>
-    </BaseCard>
+      </BaseCard>
+      <BaseCard v-if="selectedAlbum" title="Songs">
+        <SongList :songs="selectedAlbum.songs" />
+      </BaseCard>
+    </div>
   </div>
 </template>
 
